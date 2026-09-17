@@ -1,6 +1,6 @@
 # L01 · verification
 
-Student ID: ...  
+Student ID: 22984
 Commit SHA: ...
 
 ## Обязательные проверки
