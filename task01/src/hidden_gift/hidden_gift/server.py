@@ -57,7 +57,8 @@ class GiftServer(Node):
         return CancelResponse.ACCEPT
 
     def terminal_kind(self, outcome: Outcome) -> str:
-        # TODO S1: found and absent are successful action results.
+        if outcome.kind == 'found': return 'succeed'
+        if outcome.kind == 'absent': return 'succeed'
         if outcome.kind == 'canceled': return 'canceled'
         return 'abort'  # Faults stay ABORTED; starter does not falsely claim success.
 

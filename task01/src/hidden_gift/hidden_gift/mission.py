@@ -3,7 +3,9 @@ Use raster() and drive_to(); never read simulator internals or web /state.
 Return Outcome('absent') ONLY after covering the entire requested area.
 Return Outcome('found', x, y) after measuring the rectangle centre.
 """
-from course_lab.world import Area, Sample, Decision
+from math import pi
+
+from course_lab.world import Area, Sample, Decision, Outcome
 from course_lab.navigation import drive_to, raster
 from course_lab.probe import RectangleProbe
 
@@ -12,10 +14,24 @@ class Mission:
         self.area = area
         self.waypoints = raster(area)
         self.index = 0
+        self.rp = None
 
     def step(self, sample: Sample) -> Decision:
-        # TODO M1: follow raster; on green INSIDE area instantiate RectangleProbe.
-        # Probe already measures boundaries. Delegate future samples to probe.step().
-        # Basic feedback and all safety/failure policy are supplied by the adapter.
-        # Starter is intentionally stopped, not a working submission.
-        return Decision()
+        if sample.green and self.rp is None and self.area.contains(sample.x, sample.y):
+            self.rp = RectangleProbe(self.area, sample)
+            return self.rp.step(sample)
+
+        if self.rp is not None:
+            return self.rp.step(sample)
+        
+        v, w, reached = drive_to(sample, self.waypoints[self.index])
+        while reached:
+            self.index += 1
+            if self.index == len(self.waypoints):
+                return Decision(0.0, 0.0, Outcome('absent'))
+            v, w, reached = drive_to(sample, self.waypoints[self.index])
+
+        return Decision(v, w)
+        
+
+        
